@@ -2,7 +2,6 @@ package openfec
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -39,15 +38,6 @@ func (c *Client) trace(args ...interface{}) {
 	}
 }
 
-func (c *Client) prepReq(method, url, contentType string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Content-Type", contentType)
-	return req, err
-}
-
 func (c *Client) do(endpoint string, params map[string]interface{}) (*http.Response, error) {
 	u, err := url.Parse(BaseURL + endpoint)
 	if err != nil {
@@ -60,7 +50,6 @@ func (c *Client) do(endpoint string, params map[string]interface{}) (*http.Respo
 	}
 	u.RawQuery = q.Encode()
 	c.trace(u.String())
-	//req, err := c.prepReq(method, u.String(), contentType, body)
 	resp, err := http.DefaultClient.Get(u.String())
 	if err != nil {
 		return nil, err
