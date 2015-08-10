@@ -1,6 +1,6 @@
 package openfec
 
-type Pagination struct {
+type pagination struct {
 	Count   int `json:"count,omitempty"`
 	Page    int `json:"page,omitempty"`
 	Pages   int `json:"pages,omitempty"`

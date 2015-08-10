@@ -38,15 +38,19 @@ func (c *Client) trace(args ...interface{}) {
 	}
 }
 
-func (c *Client) do(endpoint string, params map[string]interface{}) (*http.Response, error) {
+func (c *Client) do(endpoint string, parameters interface{}, pagination *pagination) (*http.Response, error) {
 	u, err := url.Parse(BaseURL + endpoint)
 	if err != nil {
 		return nil, err
 	}
-	q := u.Query()
+	q, err := ToValues(parameters)
+	if err != nil {
+		return nil, err
+	}
 	q.Add("api_key", c.APIKey)
-	for key, value := range params {
-		q.Add(key, fmt.Sprint(value))
+	if pagination != nil {
+		q.Add("page", fmt.Sprint(pagination.Page))
+		q.Add("per_page", fmt.Sprint(pagination.PerPage))
 	}
 	u.RawQuery = q.Encode()
 	c.trace(u.String())
@@ -67,6 +71,9 @@ func (c *Client) do(endpoint string, params map[string]interface{}) (*http.Respo
 	case 401, 403:
 		return resp, ErrUnauthorized
 	default:
+		defer resp.Body.Close()
+		body, _ := ioutil.ReadAll(resp.Body)
+		c.trace("got 500, body:", string(body))
 		return resp, fmt.Errorf("got unexpected status code %d", resp.StatusCode)
 	}
 	return resp, err

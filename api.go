@@ -7,6 +7,6 @@ var BaseURL = "https://api.open.fec.gov/v1"
 
 type apiResponse struct {
 	ApiVersion string          `json:"api_version,omitempty"`
-	Pagination *Pagination     `json:"pagination,omitempty"`
+	Pagination *pagination     `json:"pagination,omitempty"`
 	Results    json.RawMessage `json:"results"`
 }

@@ -4,28 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"testing"
 
 	"github.com/tmc/openfec"
 )
-
-func TestGetCandidates(t *testing.T) {
-	apiKey := os.Getenv("DATA_GOV_API_KEY")
-	if apiKey == "" {
-		t.Skip("missing DATA_GOV_API_KEY")
-	}
-	client, err := openfec.NewClient(apiKey)
-	if err != nil {
-		t.Fatal(err)
-	}
-	//client.TraceOn(log.New(os.Stderr, "openfec", log.LstdFlags))
-	candidates, pagination, err := client.GetCandidates()
-	//spew.Dump(candidates, pagination, err)
-	_, _ = candidates, pagination
-	if err != nil {
-		t.Fatal(err)
-	}
-}
 
 func ExampleNewClient() {
 	apiKey := os.Getenv("DATA_GOV_API_KEY")
@@ -33,12 +14,11 @@ func ExampleNewClient() {
 	if err != nil {
 		log.Fatalln(client)
 	}
-	candidates, pagination, err := client.GetCandidates()
-	fmt.Printf("err:%v\ntype1:%T\ntype2:%T\n", err, candidates, pagination)
+	candidates, err := client.GetCandidates(nil)
+	fmt.Printf("err:%v\ntype1:%T\n", err, candidates)
 	// output:
 	// err:<nil>
-	// type1:[]*openfec.Candidate
-	// type2:*openfec.Pagination
+	// type1:*openfec.CandidateIter
 }
 
 func ExampleClient_GetCandidates() {
@@ -47,10 +27,21 @@ func ExampleClient_GetCandidates() {
 	if err != nil {
 		log.Fatalln(client)
 	}
-	candidates, pagination, err := client.GetCandidates()
-	fmt.Printf("err:%v\ntype1:%T\ntype2:%T\n", err, candidates, pagination)
+	query := &openfec.CandidateQuery{
+		Sort:   "name",
+		Office: []openfec.Office{openfec.President},
+		Cycle:  []int{2016},
+	}
+	candidates, err := client.GetCandidates(query)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for candidates.Next() {
+		c := candidates.Value()
+		_ = c
+		// do something with each candidate here
+	}
+	fmt.Println(err)
 	// output:
-	// err:<nil>
-	// type1:[]*openfec.Candidate
-	// type2:*openfec.Pagination
+	// <nil>
 }

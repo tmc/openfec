@@ -1,8 +1,16 @@
-// Package openfec implements a client library for OpenFEC
+// Package openfec implements a client library for the OpenFEC API.
 //
 // See https://api.open.fec.gov
 //
 // Overview
+//
+// This package all allows you to explore the way candidates and committees fund their campaigns
+// by accessing FEC (Federal Election Committee) data.
+//
+// A few restrictions limit the way you can use FEC data. For example, you can’t use contributor
+// lists for commercial purposes or to solicit donations.
+//
+// Get an API key here: https://api.data.gov/signup/
 //
 // Endpoints are classified in the following groups: Candidate, Committee, Financial, Filings and Schedules.
 //
