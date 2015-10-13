@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-
 	"text/template"
 
 	"github.com/tmc/openfec"
@@ -15,6 +14,7 @@ var (
 	verbose = flag.Bool("v", false, "verbose output")
 	year    = flag.Int("year", 2016, "Election cycle to list candidates from")
 	format  = flag.String("f", "{{.Name}} {{.Party}}", "Formatting string")
+	party   = flag.String("party", "", "Political party (default: all)")
 )
 
 func main() {
@@ -28,9 +28,11 @@ func main() {
 		client.TraceOn(log.New(os.Stderr, "openfec: ", log.LstdFlags))
 	}
 	query := &openfec.CandidateQuery{
-		Sort:   "name",
-		Office: []openfec.Office{openfec.President},
-		Cycle:  []int{*year},
+		Sort:            "name",
+		Office:          []openfec.Office{openfec.President},
+		CandidateStatus: []openfec.CandidateStatus{openfec.PresentCandidate},
+		Cycle:           []int{*year},
+		Party:           *party,
 	}
 	candidates, err := client.GetCandidates(query)
 	if err != nil {
