@@ -19,6 +19,9 @@ var (
 
 func main() {
 	apiKey := os.Getenv("DATA_GOV_API_KEY")
+	if apiKey == "" {
+		apiKey = "DEMO_KEY"
+	}
 	flag.Parse()
 	client, err := openfec.NewClient(apiKey)
 	if err != nil {

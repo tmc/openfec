@@ -23,6 +23,9 @@ func ExampleNewClient() {
 
 func ExampleClient_GetCandidates() {
 	apiKey := os.Getenv("DATA_GOV_API_KEY")
+	if apiKey == "" {
+		apiKey = "DEMO_KEY"
+	}
 	client, err := openfec.NewClient(apiKey)
 	if err != nil {
 		log.Fatalln(client)
