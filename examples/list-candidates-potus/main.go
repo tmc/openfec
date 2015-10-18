@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -13,7 +14,7 @@ import (
 var (
 	verbose = flag.Bool("v", false, "verbose output")
 	year    = flag.Int("year", 2016, "Election cycle to list candidates from")
-	format  = flag.String("f", "{{.Name}} {{.Party}}", "Formatting string")
+	format  = flag.String("f", "{{.CandidateID}} - {{.Name}} {{.Party}}", "Formatting string")
 	party   = flag.String("party", "", "Political party (default: all)")
 )
 
@@ -51,8 +52,14 @@ func main() {
 		log.Fatalln(err)
 	}
 	for candidates.Next() {
-		tmpl.Execute(os.Stdout, candidates.Value())
-		fmt.Println()
+		value := candidates.Value()
+		if *format == "json" {
+			buf, _ := json.Marshal(value)
+			fmt.Println(string(buf))
+		} else {
+			tmpl.Execute(os.Stdout, value)
+			fmt.Println()
+		}
 	}
 	if candidates.Err() != nil {
 		fmt.Println("Issue iterating candidates:", candidates.Err())

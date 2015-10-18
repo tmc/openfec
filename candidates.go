@@ -79,16 +79,14 @@ func newCandidateIter(query *CandidateQuery, client *Client) (*CandidateIter, er
 		query:  query,
 		client: client,
 		page: &pagination{
-			Page:    1,
+			Page:    0,
 			PerPage: 100,
 		},
 	}
-	i.current, i.page, i.err = client.getCandidates(i.query, i.page)
 	return i, i.err
 }
 
 func (i *CandidateIter) Next() bool {
-	//spew.Dump("Next:", i.index, i.index+1, len(i.current))
 	if i.index+1 >= len(i.current) {
 		i.page.Page++
 		i.current, i.page, i.err = i.client.getCandidates(i.query, i.page)
