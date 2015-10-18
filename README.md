@@ -1,6 +1,9 @@
 openfec
 =======
 
+[![GoDoc](https://godoc.org/github.com/tmc/openfec?status.svg)](http://godoc.org/github.com/tmc/openfec)
+
+
 This package provides programmatic access to the OpenFEC api.
 
 Included under cmd are example command line utilities showing consumption of this api.
