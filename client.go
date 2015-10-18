@@ -1,6 +1,7 @@
 package openfec
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -36,6 +37,17 @@ func (c *Client) trace(args ...interface{}) {
 	if c.logger != nil {
 		c.logger.Println(args)
 	}
+}
+
+type APIError struct {
+	Err struct {
+		Code    string `json:"code,omitempty"`
+		Message string `json:"message,omitempty"`
+	} `json:"error,omitempty"`
+}
+
+func (e *APIError) Error() string {
+	return fmt.Sprintf("%s - %s", e.Err.Code, e.Err.Message)
 }
 
 func (c *Client) do(endpoint string, parameters interface{}, pagination *pagination) (*http.Response, error) {
@@ -74,7 +86,13 @@ func (c *Client) do(endpoint string, parameters interface{}, pagination *paginat
 		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
 		c.trace("got 500, body:", string(body))
-		return resp, fmt.Errorf("got unexpected status code %d", resp.StatusCode)
+		if body != nil {
+			var apiErr *APIError
+			if err := json.Unmarshal(body, &apiErr); err == nil {
+				return resp, apiErr
+			}
+		}
+		return resp, fmt.Errorf("got unexpected status code %d: %s", resp.StatusCode)
 	}
 	return resp, err
 }
